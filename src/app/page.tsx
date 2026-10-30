@@ -1,69 +1,131 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import LandingBackground from "@/components/LandingBackground";
+import SiteHeader from "@/components/SiteHeader";
+import ProductViewer from "@/components/ProductViewer";
+import SoundscapeScene from "@/components/SoundscapeScene";
+import WaveformScene from "@/components/WaveformScene";
+import { products } from "@/data/productsList";
+
+function getLandingProduct() {
+  const headphone = products.find((item) => item.deviceType === "headphones");
+  if (!headphone) {
+    throw new Error("The landing page requires a headphone product.");
+  }
+  return headphone;
+}
+
+const product = getLandingProduct();
 
 export default function Home() {
+  const [selectedFinish, setSelectedFinish] = useState(product.finishes[0]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="relative isolate min-h-screen bg-transparent px-4 py-8 text-white sm:px-8 lg:px-16">
+      <LandingBackground />
+      <div className="relative z-10">
+        <SiteHeader />
+
+        <section className="mx-auto grid max-w-7xl items-center gap-10 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-16">
+        <div className="min-w-0">
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-blue-400">
+            <span className="h-2 w-2 rounded-full bg-blue-400" />
+            Designed for your world
+          </div>
+
+          <h1 className="max-w-xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            Sound that
+            <br />
+            <span className="text-gray-500">moves with you.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+          <p className="mt-6 max-w-md text-base leading-7 text-gray-400">
+            Meet Orbit One, a wireless over-ear headphone concept designed for
+            immersive listening, all-day comfort, and expressive design.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link
+              href="/configure"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-200"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              Explore in 3D
+            </Link>
+
+            <span className="text-sm text-gray-400">
+              Concept model · Interactive demo
+            </span>
+          </div>
+
+          <div className="mt-12 grid max-w-md grid-cols-3 gap-4 border-t border-white/10 pt-6">
+            <div>
+              <p className="text-lg font-semibold">360°</p>
+              <p className="mt-1 text-xs text-gray-500">View every angle</p>
+            </div>
+
+            <div>
+              <p className="text-lg font-semibold">3</p>
+              <p className="mt-1 text-xs text-gray-500">Color options</p>
+            </div>
+
+            <div>
+              <p className="text-lg font-semibold">3D</p>
+              <p className="mt-1 text-xs text-gray-500">Real-time rendering</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <ProductViewer
+            color={selectedFinish.color}
+            deviceType={product.deviceType}
+            configuration={{
+              [product.configurationOptions[0].id]:
+                product.configurationOptions[0].choices[0].id,
+            }}
+          />
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">{product.name}</p>
+              <p className="mt-1 text-sm text-gray-500">Choose your finish</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {product.finishes.map((finish) => (
+                <button
+                  key={finish.id}
+                  type="button"
+                  title={finish.name}
+                  aria-label={`Select ${finish.name} finish`}
+                  aria-pressed={selectedFinish.id === finish.id}
+                  onClick={() => setSelectedFinish(finish)}
+                  className={`h-9 w-9 rounded-full border-2 transition ${
+                    selectedFinish.id === finish.id
+                      ? "scale-110 border-white"
+                      : "border-white/20 hover:border-white/60"
+                  }`}
+                  style={{ backgroundColor: finish.color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <p className="mt-3 text-right text-xs text-gray-500">
+            Selected finish: {selectedFinish.name}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          </section>
+
+          <SoundscapeScene />
+        <WaveformScene />
+
+        <footer className="mx-auto max-w-7xl border-t border-white/10 py-6 text-xs text-gray-500">
+          ORBIT 3D — A learning project built with Next.js and Three.js.
+        </footer>
+      </div>
+    </main>
   );
 }
